@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
 
 import sqlite3
-
 from sql_queries import (
     select_all_female_bears_return_name_and_age,
     select_all_bears_names_and_orders_in_alphabetical_order,
@@ -11,16 +9,23 @@ from sql_queries import (
 )
 
 connection = sqlite3.connect(":memory:")
-
 cursor = connection.cursor()
 
-create_file = open("lib/create.sql")
-create_as_string = create_file.read()
-cursor.executescript(create_as_string)
+with open("lib/create.sql") as create_file:
+    create_as_string = create_file.read()
+    cursor.executescript(create_as_string)
 
-insert_file = open("lib/seed.sql")
-insert_as_string = insert_file.read()
-cursor.executescript(insert_as_string)
+with open("lib/seed.sql") as insert_file:
+    insert_as_string = insert_file.read()
+    cursor.executescript(insert_as_string)
+
+class TestInsert:
+    '''Test insertions into bears table'''
+
+    def test_has_unnamed_bear(self):
+        '''inserts one unnamed bear into bears table.'''
+        result = cursor.execute("SELECT COUNT(*) FROM bears WHERE name IS NULL;")
+        assert(result.fetchall()[0][0] == 1)
 
 class TestSelectAllFemaleBearsReturnNameAndAge:
     '''select_all_female_bears_return_name_and_age in sql_queries.py'''
